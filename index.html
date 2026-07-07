@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TechStore Support</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0a0a0f;
+      min-height: 100vh;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 260px;
+      background: #0d0d14;
+      border-right: 1px solid #1e1e2e;
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      position: fixed;
+      /* ← yeh add karein */
+      height: 100vh;
+      /* ← yeh add karein */
+      left: 0;
+      /* ← yeh add karein */
+      top: 0;
+      /* ← yeh add karein */
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      margin-bottom: 16px;
+    }
+
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .logo h1 {
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .logo span {
+      color: #6366f1;
+      font-size: 11px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      color: #666;
+      font-size: 14px;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .nav-item:hover {
+      background: #1a1a2e;
+      color: #818cf8;
+    }
+
+    .nav-item.active {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.2));
+      color: #818cf8;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+    }
+
+    .nav-icon {
+      font-size: 18px;
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 12px;
+      background: #1a1a2e;
+      border-radius: 10px;
+      border: 1px solid rgba(99, 102, 241, 0.2);
+    }
+
+    .sidebar-footer p {
+      color: #666;
+      font-size: 11px;
+    }
+
+    .sidebar-footer span {
+      color: #22c55e;
+    }
+
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      margin-left: 260px;
+      /* ← yeh add karein (sidebar ki width jitna) */
+      height: 100vh;
+      /* ← yeh add karein */
+    }
+
+    /* Top bar */
+    .topbar {
+      background: #0d0d14;
+      border-bottom: 1px solid #1e1e2e;
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .topbar h2 {
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .status-badge {
+      background: rgba(34, 197, 94, 0.1);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      color: #22c55e;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+    }
+
+    .admin-link {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: white;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    /* Chat area */
+    .chat-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      overflow: hidden;
+    }
+
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding-bottom: 10px;
+    }
+
+    .msg {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .msg.user {
+      align-items: flex-end;
+    }
+
+    .msg.bot {
+      align-items: flex-start;
+    }
+
+    .msg-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 5px;
+    }
+
+    .msg.user .msg-meta {
+      flex-direction: row-reverse;
+    }
+
+    .msg-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+
+    .msg.bot .msg-avatar {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    }
+
+    .msg.user .msg-avatar {
+      background: #1e1e2e;
+    }
+
+    .msg-name {
+      color: #555;
+      font-size: 11px;
+    }
+
+    .bubble {
+      max-width: 70%;
+      padding: 12px 16px;
+      font-size: 14px;
+      line-height: 1.7;
+      white-space: pre-wrap;
+    }
+
+    .msg.bot .bubble {
+      background: #13131f;
+      border: 1px solid #1e1e2e;
+      border-radius: 4px 18px 18px 18px;
+      color: #e2e8f0;
+    }
+
+    .msg.user .bubble {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      border-radius: 18px 4px 18px 18px;
+      color: #fff;
+    }
+
+    /* Typing */
+    .typing-bubble {
+      padding: 14px 18px;
+      background: #13131f;
+      border: 1px solid #1e1e2e;
+      border-radius: 4px 18px 18px 18px;
+      display: flex;
+      gap: 5px;
+    }
+
+    .typing-bubble span {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #6366f1;
+      animation: bounce 1.2s infinite;
+    }
+
+    .typing-bubble span:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .typing-bubble span:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    /* Products Showcase - Glass Effect + 3D */
+    .products-showcase {
+      padding: 12px 0;
+      display: flex;
+      gap: 14px;
+      overflow-x: auto;
+      margin-bottom: 8px;
+    }
+
+    .product-card {
+      min-width: 170px;
+      background: rgba(99, 102, 241, 0.08);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(139, 92, 246, 0.25);
+      border-radius: 18px;
+      padding: 18px 14px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .product-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+      transition: left 0.5s;
+    }
+
+    .product-card:hover::before {
+      left: 100%;
+    }
+
+    .product-card:hover {
+      transform: translateY(-6px);
+      border-color: #8b5cf6;
+      box-shadow: 0 15px 40px rgba(139, 92, 246, 0.25);
+    }
+
+    .product-3d {
+      font-size: 48px;
+      display: inline-block;
+      transform-style: preserve-3d;
+      margin-bottom: 10px;
+      filter: drop-shadow(0 10px 20px rgba(139, 92, 246, 0.4));
+      animation: rotate3d 6s linear infinite;
+      cursor: grab;
+      user-select: none;
+    }
+
+    .product-3d.dragging {
+      animation: none;
+      cursor: grabbing;
+    }
+
+    .product-card:hover .product-3d {
+      animation-duration: 2s;
+    }
+
+    .product-name {
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .product-price {
+      color: #818cf8;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .product-stock {
+      font-size: 10px;
+      margin-top: 6px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      display: inline-block;
+    }
+
+    .in-stock {
+      background: rgba(34, 197, 94, 0.15);
+      color: #22c55e;
+    }
+
+    .out-stock {
+      background: rgba(239, 68, 68, 0.15);
+      color: #ef4444;
+    }
+
+    /* Quick replies */
+    .quick-replies {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 12px 0;
+    }
+
+    .qbtn {
+      background: #0d0d14;
+      border: 1px solid #2a2a3e;
+      color: #818cf8;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .qbtn:hover {
+      background: #1a1a2e;
+      border-color: #6366f1;
+    }
+
+    /* Input */
+    .input-box {
+      background: #0d0d14;
+      border: 1px solid #1e1e2e;
+      border-radius: 14px;
+      padding: 12px 16px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+      margin-top: 8px;
+    }
+
+    textarea {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-size: 14px;
+      resize: none;
+      outline: none;
+      min-height: 22px;
+      max-height: 100px;
+      font-family: inherit;
+      line-height: 1.5;
+    }
+
+    textarea::placeholder {
+      color: #444;
+    }
+
+    .send-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      border: none;
+      cursor: pointer;
+      color: white;
+      font-size: 16px;
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+
+    .send-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    ::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #1e1e2e;
+      border-radius: 4px;
+    }
+
+    @keyframes bounce {
+
+      0%,
+      60%,
+      100% {
+        transform: translateY(0)
+      }
+
+      30% {
+        transform: translateY(-7px)
+      }
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: 0.4
+      }
+    }
+
+    @keyframes rotate3d {
+      0% {
+        transform: rotateY(0deg);
+      }
+
+      100% {
+        transform: rotateY(360deg);
+      }
+    }
+
+    .msg-options {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 8px;
+      max-width: 70%;
+    }
+
+    .option-btn {
+      background: rgba(99, 102, 241, 0.1);
+      border: 1px solid rgba(139, 92, 246, 0.4);
+      color: #a5b4fc;
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-size: 13px;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .option-btn:hover {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(139, 92, 246, 0.25));
+      border-color: #8b5cf6;
+      color: #fff;
+      transform: translateX(4px);
+    }
+
+    .mic-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: #1a1a2e;
+      border: 1px solid #2a2a3e;
+      cursor: pointer;
+      font-size: 16px;
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+
+    .mic-btn:hover {
+      border-color: #6366f1;
+    }
+
+    .mic-btn.listening {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      border-color: #ef4444;
+      animation: micPulse 1.5s infinite;
+    }
+
+    @keyframes micPulse {
+
+      0%,
+      100% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5);
+      }
+
+      50% {
+        box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="logo">
+      <div class="logo-icon">🛒</div>
+      <div>
+        <h1>TechStore</h1>
+        <span>AI Support</span>
+      </div>
+    </div>
+
+    <a class="nav-item active" href="index.html">
+      <span class="nav-icon">💬</span> Live Chat
+    </a>
+    <a class="nav-item" href="admin.html">
+      <span class="nav-icon">📊</span> Admin Dashboard
+    </a>
+    <a class="nav-item" href="admin.html#orders">
+      <span class="nav-icon">📦</span> Orders
+    </a>
+    <a class="nav-item" href="admin.html#refunds">
+      <span class="nav-icon">↩️</span> Refunds
+    </a>
+    <a class="nav-item" href="admin.html#products">
+      <span class="nav-icon">🏷️</span> Products
+    </a>
+
+    <div class="sidebar-footer">
+      <p>AI Status: <span>● Online</span></p>
+      <p style="margin-top:4px; color:#444;">Powered by Claude AI</p>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="topbar">
+      <h2>💬 Customer Support Chat</h2>
+      <div class="topbar-right">
+        <div class="status-badge">● Agent Active</div>
+        <a href="admin.html" class="admin-link">Admin Panel →</a>
+      </div>
+    </div>
+
+    <div class="chat-container">
+      <div class="messages" id="messages">
+        <div class="msg bot">
+          <div class="msg-meta">
+            <div class="msg-avatar">🤖</div>
+            <span class="msg-name">TechStore Agent</span>
+          </div>
+          <div class="bubble">👋 Welcome to TechStore Support!
+
+            I can help you with:
+            • 📦 Track your order
+            • ↩️ Return or refund request
+            • ✅ Check product availability
+            • ❌ Cancel an order
+            • 🛒 Place a new order
+
+            How can I help you today?</div>
+        </div>
+      </div>
+
+      <!-- Products Showcase (Glass + 3D) -->
+      <div class="products-showcase" id="products-showcase"></div>
+
+      <div class="quick-replies">
+        <button class="qbtn" onclick="setMsg('Track my order ORD-001')">📦 Track ORD-001</button>
+        <button class="qbtn" onclick="setMsg('I want to return my laptop ORD-003, it stopped working')">↩️ Return
+          ORD-003</button>
+        <button class="qbtn" onclick="setMsg('Is iPhone 15 available?')">✅ iPhone 15?</button>
+        <button class="qbtn" onclick="setMsg('Cancel my order ORD-002')">❌ Cancel ORD-002</button>
+        <button class="qbtn" onclick="setMsg('I want to buy iPhone 15')">🛒 Buy iPhone 15</button>
+      </div>
+
+      <div class="input-box">
+        <textarea id="input" placeholder="Type your message... (Enter to send)" rows="1"></textarea>
+        <button class="mic-btn" id="mic-btn" onclick="toggleVoice()">🎤</button>
+        <button class="send-btn" id="send-btn" onclick="send()">➤</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ---- Products Showcase (Glass cards + 3D rotation) ----
+    async function loadProducts() {
+      try {
+        const res = await fetch('http://127.0.0.1:8000/admin/products');
+        const data = await res.json();
+        const container = document.getElementById('products-showcase');
+
+        const emojis = {
+          'iPhone 15': '📱',
+          'Samsung TV': '📺',
+          'Laptop Dell': '💻',
+          'AirPods Pro': '🎧',
+          'MacBook Pro': '💻'
+        };
+
+        container.innerHTML = data.products.map(p => `
+          <div class="product-card" onclick="setMsg('Tell me about ${p.name}')">
+            <div class="product-3d">${emojis[p.name] || '📦'}</div>
+            <div class="product-name">${p.name}</div>
+            <div class="product-price">Rs ${p.price.toLocaleString()}</div>
+            <div class="product-stock ${p.stock > 0 ? 'in-stock' : 'out-stock'}">
+              ${p.stock > 0 ? '✓ In Stock' : '✗ Out of Stock'}
+            </div>
+          </div>
+        `).join('');
+      } catch (e) {
+        console.log('Products load nahi hue - FastAPI server check karein');
+      }
+    }
+
+
+    // ---- Mouse Drag se 360 Rotation ----
+    let isDragging = false;
+    let currentElement = null;
+    let startX = 0;
+    let currentRotation = 0;
+
+    document.addEventListener('mousedown', (e) => {
+      if (e.target.classList.contains('product-3d')) {
+        isDragging = true;
+        currentElement = e.target;
+        startX = e.clientX;
+        // Current rotation nikalo
+        const match = currentElement.style.transform.match(/rotateY\(([-\d.]+)deg\)/);
+        currentRotation = match ? parseFloat(match[1]) : 0;
+        currentElement.classList.add('dragging');
+        e.preventDefault();
+      }
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (!isDragging || !currentElement) return;
+      const deltaX = e.clientX - startX;
+      const rotation = currentRotation + deltaX * 1.5; // speed control
+      currentElement.style.transform = `rotateY(${rotation}deg)`;
+    });
+
+    document.addEventListener('mouseup', () => {
+      if (currentElement) {
+        currentElement.classList.remove('dragging');
+      }
+      isDragging = false;
+      currentElement = null;
+    });
+
+
+
+    // ---- Session Management ----
+    function getSessionId() {
+      let sid = localStorage.getItem('techstore_sid');
+      if (!sid) { sid = crypto.randomUUID(); localStorage.setItem('techstore_sid', sid); }
+      return sid;
+    }
+    const sessionId = getSessionId();
+    const msgs = document.getElementById('messages');
+    const input = document.getElementById('input');
+    const btn = document.getElementById('send-btn');
+
+    function getTime() {
+      return new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function setMsg(text) { input.value = text; input.focus(); }
+
+    function addMsg(text, role) {
+      let mainText = text;
+      let options = [];
+
+      // Options detect karo
+      const optionsMatch = text.match(/\[OPTIONS\]([\s\S]*?)\[\/OPTIONS\]/);
+      if (optionsMatch) {
+        mainText = text.replace(/\[OPTIONS\][\s\S]*?\[\/OPTIONS\]/, '').trim();
+        options = optionsMatch[1].trim().split('\n').filter(o => o.trim());
+      }
+
+      const div = document.createElement('div');
+      div.className = `msg ${role}`;
+
+      let optionsHtml = '';
+      if (options.length > 0) {
+        optionsHtml = `<div class="msg-options">` +
+          options.map(o => `<button class="option-btn" onclick="sendOption('${o.trim().replace(/'/g, "\\'")}')">${o.trim()}</button>`).join('') +
+          `</div>`;
+      }
+
+      div.innerHTML = `
+      <div class="msg-meta">
+        <div class="msg-avatar">${role === 'bot' ? '🤖' : '👤'}</div>
+        <span class="msg-name">${role === 'bot' ? 'TechStore Agent' : 'You'} • ${getTime()}</span>
+      </div>
+      <div class="bubble">${mainText}</div>
+      ${optionsHtml}`;
+      msgs.appendChild(div);
+      msgs.scrollTop = msgs.scrollHeight;
+    }
+
+    function sendOption(text) {
+      input.value = text;
+      send();
+    }
+
+    function showTyping() {
+      const div = document.createElement('div');
+      div.className = 'msg bot'; div.id = 'typing';
+      div.innerHTML = `
+      <div class="msg-meta">
+        <div class="msg-avatar">🤖</div>
+        <span class="msg-name">Agent is thinking...</span>
+      </div>
+      <div class="typing-bubble"><span></span><span></span><span></span></div>`;
+      msgs.appendChild(div);
+      msgs.scrollTop = msgs.scrollHeight;
+    }
+
+    async function send() {
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = ''; input.style.height = 'auto'; btn.disabled = true;
+      addMsg(text, 'user');
+      showTyping();
+      try {
+        const res = await fetch('http://127.0.0.1:8000/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: text, session_id: sessionId })
+        });
+        const data = await res.json();
+        document.getElementById('typing')?.remove();
+        addMsg(data.reply, 'bot');
+        if (voiceMode) {
+          speak(data.reply);
+          voiceMode = false;
+        }
+      } catch {
+        document.getElementById('typing')?.remove();
+        addMsg('❌ Connection error. FastAPI server chal raha hai?', 'bot');
+      }
+      btn.disabled = false; input.focus();
+    }
+
+    input.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } });
+    input.addEventListener('input', () => { input.style.height = 'auto'; input.style.height = input.scrollHeight + 'px'; });
+
+    // Products load karo page khulte hi
+
+
+    // ---- Purani chat history load karo ----
+    async function loadChatHistory() {
+      try {
+        const res = await fetch(`http://127.0.0.1:8000/chat/history/${sessionId}`);
+        const data = await res.json();
+        if (data.messages.length > 0) {
+          data.messages.forEach(m => {
+            addMsg(m.content, m.role === 'assistant' ? 'bot' : 'user');
+          });
+        }
+      } catch (e) {
+        console.log('History load nahi hui');
+      }
+    }
+    loadProducts();
+    loadChatHistory();
+
+
+    // ---- VOICE AGENT ----
+    let recognition = null;
+    let isListening = false;
+    let voiceMode = false;  // voice se poocha to voice mein jawab
+
+    // Speech Recognition setup (awaaz → text)
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechRecognition();
+      recognition.lang = 'en-US';       // 'ur-PK' bhi try kar sakte hain Urdu ke liye
+      recognition.continuous = false;
+      recognition.interimResults = false;
+
+      recognition.onresult = (event) => {
+        const text = event.results[0][0].transcript;
+        input.value = text;
+        voiceMode = true;   // voice se aya, voice mein jawab do
+        send();
+      };
+
+      recognition.onend = () => {
+        isListening = false;
+        document.getElementById('mic-btn').classList.remove('listening');
+      };
+
+      recognition.onerror = (e) => {
+        isListening = false;
+        document.getElementById('mic-btn').classList.remove('listening');
+        if (e.error === 'not-allowed') {
+          alert('Microphone permission dein browser mein!');
+        }
+      };
+    }
+
+    function toggleVoice() {
+      if (!recognition) {
+        alert('Aapka browser voice support nahi karta. Chrome use karein!');
+        return;
+      }
+      if (isListening) {
+        recognition.stop();
+      } else {
+        isListening = true;
+        document.getElementById('mic-btn').classList.add('listening');
+        recognition.start();
+      }
+    }
+
+    // Text-to-Speech (text → awaaz)
+    function speak(text) {
+      // Emojis, markdown, aur [OPTIONS] hatao bolne se pehle
+      let cleanText = text
+        .replace(/\[OPTIONS\][\s\S]*?\[\/OPTIONS\]/g, '')
+        .replace(/[*#_`~]/g, '')
+        .replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, '')
+        .trim();
+
+      if (!cleanText) return;
+
+      window.speechSynthesis.cancel();  // pehli awaaz roko
+      const utterance = new SpeechSynthesisUtterance(cleanText);
+      utterance.rate = 1.0;
+      utterance.pitch = 1.0;
+      utterance.lang = 'en-US';
+      window.speechSynthesis.speak(utterance);
+    }
+
+  </script>
+</body>
+
+</html>
