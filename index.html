@@ -642,7 +642,7 @@
     // ---- Products Showcase (Glass cards + 3D rotation) ----
     async function loadProducts() {
       try {
-        const res = await fetch('http://127.0.0.1:8000/admin/products');
+        const res = await fetch('https://devbilal1-techstore-backend.hf.space/admin/products');
         const data = await res.json();
         const container = document.getElementById('products-showcase');
 
@@ -780,7 +780,7 @@
       addMsg(text, 'user');
       showTyping();
       try {
-        const res = await fetch('http://127.0.0.1:8000/chat', {
+        const res = await fetch('https://devbilal1-techstore-backend.hf.space/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ message: text, session_id: sessionId })
@@ -808,7 +808,7 @@
     // ---- Purani chat history load karo ----
     async function loadChatHistory() {
       try {
-        const res = await fetch(`http://127.0.0.1:8000/chat/history/${sessionId}`);
+        const res = await fetch(`https://devbilal1-techstore-backend.hf.space/chat/history/${sessionId}`);
         const data = await res.json();
         if (data.messages.length > 0) {
           data.messages.forEach(m => {
